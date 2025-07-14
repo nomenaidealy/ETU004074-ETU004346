@@ -2,7 +2,9 @@
 include '../inc/fonction.php';
 ini_set('display_errors', 1);
 session_start();
-$result = liste_categories();
+
+// Remplace ici :
+$donnees = liste_objets_avec_dates_condition();
 ?>
 
 <!DOCTYPE html>
@@ -17,24 +19,26 @@ $result = liste_categories();
 <body>
 
 <div class="container my-5">
-    <h1 class="text-center mb-4">Liste des objets avec catégories</h1>
+    <h1 class="text-center mb-4">Liste des objets avec catégories et emprunts</h1>
 
     <table class="table table-striped table-bordered">
         <thead class="table-dark">
             <tr>
                 <th>Nom catégorie</th>
                 <th>Nom objet</th>
+                <th>Date emprunt</th>
+                <th>Date retour</th>
             </tr>
         </thead>
         <tbody>
-            <?php
-            while ($row = mysqli_fetch_assoc($result)) {
-                echo '<tr>';
-                echo '<td>' . htmlspecialchars($row['nom_categorie']) . '</td>';
-                echo '<td>' . htmlspecialchars($row['nom_objet']) . '</td>';
-                echo '</tr>';
-            }
-            ?>
+            <?php foreach ($donnees as $row): ?>
+                <tr>
+                    <td><?= htmlspecialchars($row['nom_categorie']) ?></td>
+                    <td><?= htmlspecialchars($row['nom_objet']) ?></td>
+                    <td><?= $row['date_emprunt'] ?? '-' ?></td>
+                    <td><?= $row['date_retour'] ?? '-' ?></td>
+                </tr>
+            <?php endforeach; ?>
         </tbody>
     </table>
 </div>

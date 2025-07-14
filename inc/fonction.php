@@ -27,3 +27,40 @@ function liste_objets_filtre($id_categorie = null) {
     $conn = dbconnect();
 
 }
+
+
+function liste_objets_avec_dates_condition()
+{
+    
+    $sql_cat = "SELECT * FROM v_cat";
+    $res_cat = mysqli_query(dbconnect(), $sql_cat);
+
+    $sql_emp = "SELECT id_objet, date_emprunt, date_retour FROM v_emprunt";
+    $res_emp = mysqli_query(dbconnect(), $sql_emp);
+
+    $emprunts = [];
+    while ($row = mysqli_fetch_assoc($res_emp)) {
+        $emprunts[$row['id_objet']] = [
+            'date_emprunt' => $row['date_emprunt'],
+            'date_retour' => $row['date_retour']
+        ];
+    }
+    $resultat_final = [];
+    while ($row = mysqli_fetch_assoc($res_cat)) {
+        $id = $row['id_objet'];
+
+        
+        if (isset($emprunts[$id])) {
+            $row['date_emprunt'] = $emprunts[$id]['date_emprunt'];
+            $row['date_retour'] = $emprunts[$id]['date_retour'];
+        } else {
+            $row['date_emprunt'] = null;
+            $row['date_retour'] = null;
+        }
+
+        $resultat_final[] = $row;
+    }
+
+    return $resultat_final; 
+}
+
