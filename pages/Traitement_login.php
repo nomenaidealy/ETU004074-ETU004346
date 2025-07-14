@@ -12,5 +12,5 @@ echo $_SESSION['email'];
 if (mysqli_fetch_assoc($log) == null) {
     header('location:inscription.php');
 } else {
-    header('location:site.php');
+    header('location:liste_objet.php');
 }

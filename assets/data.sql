@@ -133,5 +133,19 @@ INSERT INTO emprunt (id_objet, id_membre, date_emprunt, date_retour) VALUES
 (3, 2, '2025-07-09', '2025-07-19'),
 (15, 1, '2025-07-10', '2025-07-20');
 
-create or replace view v_cat as  select c.nom_categorie, o.nom_objet, o.id_objet  from objet o join categorie_objet c on c.id_categorie= o.id_categorie ; 
+CREATE OR REPLACE VIEW v_cat AS 
+SELECT c.nom_categorie, o.nom_objet, o.id_objet,o.id_categorie,     
+(SELECT nom_image          
+FROM images_objet i          
+WHERE i.id_objet = o.id_objet          
+ORDER BY i.id_image          
+LIMIT 1 ) AS nom_image 
+FROM objet o JOIN categorie_objet c 
+ON c.id_categorie = o.id_categorie;
 
+
+create or replace view v_emprunt as  
+select o.nom_objet, o.id_objet,e.date_emprunt, e.date_retour  
+from objet o 
+join emprunt e 
+on o.id_objet = e.id_objet ;
