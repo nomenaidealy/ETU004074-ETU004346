@@ -240,3 +240,25 @@ function get_objets_par_membre_regroupes($id_membre) {
     }
     return $groupes;
 }
+
+
+
+function enregistrer_emprunt($id_objet, $id_membre, $nb_jours) {
+    $conn = dbconnect();
+
+    $id_objet = intval($id_objet);
+    $id_membre = intval($id_membre);
+    $nb_jours = intval($nb_jours);
+
+    if ($nb_jours <= 0) return false;
+
+    $date_emprunt = date('Y-m-d');
+    $date_retour = date('Y-m-d', strtotime("+$nb_jours days"));
+
+    
+    $sql = "INSERT INTO emprunt (id_objet, id_membre, date_emprunt, date_retour)
+            VALUES ($id_objet, $id_membre, '$date_emprunt', '$date_retour')";
+
+    return mysqli_query($conn, $sql);
+}
+
