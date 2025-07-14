@@ -1,0 +1,97 @@
+<?php
+require("connection.php");
+
+function inscription($prenom, $email, $mot_de_passe)
+{
+    $sql = "INSERT INTO membre(prenom, email, mot_de_passe)
+            VALUES('$prenom','$email','$mot_de_passe')";
+    mysqli_query(dbconnect(), $sql);
+    return $email;
+}
+//create or replace view v_get_info_connecter as select * from membre where email=$email;
+
+function get_info_connecter($email)
+{
+    $sql = "SELECT * FROM membre WHERE email = '$email'";
+    $resultat = mysqli_query(dbconnect(), $sql);
+    return $resultat;
+}
+
+function login($email, $mot_de_passe)
+{
+    $sql = "SELECT * FROM membre WHERE email='$email' AND mot_de_passe='$mot_de_passe'";
+    $res = mysqli_query(dbconnect(), $sql);
+    return $res;
+}
+function ajouter_profil($link, $email)
+{
+    $sql = "UPDATE membre SET profil = '$link' WHERE email = '$email'";
+    $res = mysqli_query(dbconnect(), $sql);
+    return $res;
+}
+
+function suggestion_amis()
+{
+    $sql = 'Select * from membre';
+    $resultat = mysqli_query(dbconnect(), $sql);
+    return $resultat;
+}
+function ajouter_publication($email, $contenu, $image = null)
+{
+    global $conn;
+    $stmt = mysqli_prepare(dbconnect(), "INSERT INTO publications (email, contenu, image, date_pub) VALUES (?, ?, ?, NOW())");
+    mysqli_stmt_bind_param($stmt, "sss", $email, $contenu, $image);
+    mysqli_stmt_execute($stmt);
+    mysqli_stmt_close($stmt);
+}
+function get_all_publications()
+{
+    $sql = "SELECT publications.*,membre.prenom 
+            FROM publications 
+            JOIN membre ON publications.email = membre.email 
+            ORDER BY date_pub DESC";
+    return mysqli_query(dbconnect(), $sql);
+}
+function ajouter_ami($email1, $email2)
+{
+    $check = "SELECT * FROM amis WHERE (user1_email = '$email1' AND user2_email = '$email2') OR (user1_email = '$email2' AND user2_email = '$email1')";
+    $res = mysqli_query(dbconnect(), $check);
+    if (mysqli_num_rows($res) === 0) {
+        $sql = "INSERT INTO amis (user1_email, user2_email) VALUES ('$email1', '$email2')";
+        return mysqli_query(dbconnect(), $sql);
+    }
+    return false; // déjà amis
+}
+
+function supprimer_ami($email1, $email2)
+{
+    $email1 = mysqli_real_escape_string(dbconnect(), $email1);
+    $email2 = mysqli_real_escape_string(dbconnect(), $email2);
+
+    $sql = "DELETE FROM amis WHERE (user1_email = '$email1' AND user2_email = '$email2') OR (user1_email = '$email2' AND user2_email = '$email1')";
+    return mysqli_query(dbconnect(), $sql);
+}
+
+/*function get_amis($email)
+{
+    $email = mysqli_real_escape_string(dbconnect(), $email);
+    $sql = "SELECT * FROM membre WHERE email IN (
+        SELECT CASE
+            WHEN user1_email = '$email' THEN user2_email
+            ELSE user1_email
+        END FROM amis WHERE user1_email = '$email' OR user2_email = '$email'
+    )";
+    return mysqli_query(dbconnect(), $sql);
+}
+function recherche_utilisateur($mot_cle)
+{
+    $conn = dbconnect();
+    $mot_cle = mysqli_real_escape_string($conn, $mot_cle);
+
+    $sql = "SELECT * FROM membre WHERE prenom LIKE '%$mot_cle%' OR email LIKE '%$mot_cle%'";
+    $res = mysqli_query($conn, $sql);
+
+    return $res;
+}
+*/
+
