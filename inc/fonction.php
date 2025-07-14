@@ -215,13 +215,6 @@ function get_emprunts_by_objet($id_objet) {
     return $emprunts;
 }
 
-function get_membre_by_id($id) {
-    $id = intval($id);
-    $conn = dbconnect();
-    $sql = "SELECT * FROM membre WHERE id_membre = $id";
-    $res = mysqli_query($conn, $sql);
-    return mysqli_fetch_assoc($res);
-}
 
 function get_objets_par_membre_regroupes($id_membre) {
     $id = intval($id_membre);
@@ -240,8 +233,42 @@ function get_objets_par_membre_regroupes($id_membre) {
     }
     return $groupes;
 }
+function get_membre_by_id($id) {
+    $id = intval($id);
+    $conn = dbconnect();
+    $sql = "SELECT * FROM membre WHERE id_membre = $id";
+    $res = mysqli_query($conn, $sql);
+    return mysqli_fetch_assoc($res);
+}
 
 
+
+function get_emprunts_en_cours_par_membre($id_membre) {
+    $conn = dbconnect();
+    $id_membre = intval($id_membre);
+    // On récupère les emprunts dont la date_retour_effectif est NULL (non retourné)
+    $sql = "select * from emprunt where id_membre = $id_membre";
+
+    $res = mysqli_query($conn, $sql);
+    $emprunts = [];
+    if ($res) {
+        while ($row = mysqli_fetch_assoc($res)) {
+            $emprunts[] = $row;
+        }
+    }
+    return $emprunts;
+}
+
+
+function retourner_emprunt($id_emprunt, $etat) {
+    $conn = dbconnect();
+    $id_emprunt = intval($id_emprunt);
+    $etat = ($etat === 'abime') ? 1 : 0;
+    $date_retour_effectif = date('Y-m-d');
+
+    $sql = "UPDATE emprunt SET date_retour= '$date_retour_effectif', etat_objet = $etat WHERE id_emprunt = $id_emprunt";
+    return mysqli_query($conn, $sql);
+}
 
 function enregistrer_emprunt($id_objet, $id_membre, $nb_jours) {
     $conn = dbconnect();

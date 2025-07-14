@@ -1,21 +1,18 @@
 <?php
-include '../inc/fonction.php';
-ini_set('display_errors', 1);
 session_start();
+require '../inc/fonction.php';
 
-$id_objet = $_GET['id_objet'] ?? null;
-if (!$id_objet) {
-    die("ID objet manquant.");
+if (!isset($_SESSION['id'])) {
+    header("Location: login.php"); // ou une page de connexion
+    exit;
 }
 
-$objet = get_objet_by_id($id_objet);
-if (!$objet) {
-    die("Objet introuvable.");
-}
+$id = $_SESSION['id'];
 
-$images = get_images_by_objet($id_objet);
-$emprunts = get_emprunts_by_objet($id_objet);
+$membre = get_membre_by_id($id);
+$objets = get_objets_par_membre_regroupes($id);
 ?>
+
 
 <!DOCTYPE html>
 <html lang="fr">
@@ -24,15 +21,20 @@ $emprunts = get_emprunts_by_objet($id_objet);
     <title>Détails - <?= htmlspecialchars($objet['nom_objet']) ?></title>
     <link href="../bootstrap/css/bootstrap.min.css" rel="stylesheet">
 </head>
-<body>
-<div class="container my-5">
+<body class="bg-light">
 
-    <h1 class="mb-4"><?= htmlspecialchars($objet['nom_objet']) ?></h1>
-    <p><strong>Catégorie :</strong> <?= htmlspecialchars($objet['nom_categorie']) ?></p>
+<div class="container py-5">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3 mb-0"><?= htmlspecialchars($objet['nom_objet']) ?></h1>
+        <a href="liste_objet.php" class="btn btn-outline-secondary">← Retour</a>
+    </div>
+
+    <p class="text-muted fst-italic">Catégorie : <?= htmlspecialchars($objet['nom_categorie']) ?></p>
 
     <?php if (!empty($images)): ?>
-    <div id="carouselImages" class="carousel slide mb-4" data-bs-ride="carousel">
-        <div class="carousel-inner">
+    <div id="carouselImages" class="carousel slide mb-5" data-bs-ride="carousel" style="max-width: 600px;">
+        <div class="carousel-inner rounded shadow-sm">
             <?php foreach ($images as $index => $img): ?>
             <div class="carousel-item <?= $index === 0 ? 'active' : '' ?>">
                 <img src="../image/<?= htmlspecialchars($img) ?>" class="d-block w-100" alt="Image <?= $index + 1 ?>">
@@ -49,34 +51,35 @@ $emprunts = get_emprunts_by_objet($id_objet);
         </button>
     </div>
     <?php else: ?>
-        <p>Aucune image disponible.</p>
+        <p class="text-muted">Aucune image disponible.</p>
     <?php endif; ?>
 
-    <h3>Historique des emprunts</h3>
+    <h4 class="mb-3">Historique des emprunts</h4>
     <?php if (!empty($emprunts)): ?>
-    <table class="table table-bordered">
-        <thead class="table-light">
-            <tr>
-                <th>Date emprunt</th>
-                <th>Date retour</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php foreach ($emprunts as $emp): ?>
-            <tr>
-                <td><?= htmlspecialchars($emp['date_emprunt']) ?></td>
-                <td><?= $emp['date_retour'] ?? '-' ?></td>
-            </tr>
-            <?php endforeach; ?>
-        </tbody>
-    </table>
+    <div class="table-responsive">
+        <table class="table table-striped table-hover align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>Date emprunt</th>
+                    <th>Date retour</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($emprunts as $emp): ?>
+                <tr>
+                    <td><?= htmlspecialchars($emp['date_emprunt']) ?></td>
+                    <td><?= $emp['date_retour'] ?? '-' ?></td>
+                </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+    </div>
     <?php else: ?>
-        <p>Aucun emprunt enregistré.</p>
+        <p class="text-muted">Aucun emprunt enregistré.</p>
     <?php endif; ?>
 
-    <a href="liste_objet.php" class="btn btn-secondary mt-4">← Retour à la liste</a>
 </div>
 
-
+<script src="../bootstrap/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
