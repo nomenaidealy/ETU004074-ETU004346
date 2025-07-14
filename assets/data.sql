@@ -132,3 +132,6 @@ INSERT INTO emprunt (id_objet, id_membre, date_emprunt, date_retour) VALUES
 (40, 4, '2025-07-08', '2025-07-18'),
 (3, 2, '2025-07-09', '2025-07-19'),
 (15, 1, '2025-07-10', '2025-07-20');
+
+create or replace view v_cat as  select c.nom_categorie, o.nom_objet, o.id_objet  from objet o join categorie_objet c on c.id_categorie= o.id_categorie ; 
+

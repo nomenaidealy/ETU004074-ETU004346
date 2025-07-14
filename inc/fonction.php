@@ -15,3 +15,15 @@ function login($email, $mot_de_passe)
     $res = mysqli_query(dbconnect(), $sql);
     return $res;
 }
+function liste_categories() {
+    $conn = dbconnect();
+    $sql = "SELECT * from v_cat";
+    $result = mysqli_query($conn, $sql);
+
+    return $result;
+}
+
+function liste_objets_filtre($id_categorie = null) {
+    $conn = dbconnect();
+
+}
